@@ -11,7 +11,7 @@ const allowedOrigins = ['https://inotes-react.web.app'];
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
-    origin: '*',
+    origin: 'http://localhost:3000',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
