@@ -31,7 +31,7 @@ router.post('/authuser', async(req, res) => {
             maxAge: 900000,
             httpOnly: true
         });
-        return res.json(200, { 'name': user.name, 'email': user.email, 'work': user.work, 'phone': user.phone });
+        return res.json(200, { name: user.name, email: user.email, work: user.work, phone: user.phone });
     } catch (error) {
         console.log(error);
     }
