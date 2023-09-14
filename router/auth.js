@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
     res.send('<h1>Home Page</h1>');
 });
 
-router.post('/authuser', async (req, res) => {
+router.post('/authuser', async(req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(422).json({ message: "Empty Fields !" });
@@ -31,14 +31,14 @@ router.post('/authuser', async (req, res) => {
             maxAge: 900000,
             httpOnly: true
         });
-        return res.status(200).json({ message: "Logged In" });
+        return res.status(200).json({ 'name': user.name, 'email': user.email, 'work': user.work, 'phone': user.phone });
     } catch (error) {
         console.log(error);
     }
 
 });
 
-router.post('/adduser', async (req, res) => {
+router.post('/adduser', async(req, res) => {
     const { name, email, phone, work, password } = req.body;
     if (!name || !email || !phone || !work || !password) {
         return res.status(421).json({ message: "Empty Fields" })
@@ -94,7 +94,7 @@ router.get('/contact', authuser, (req, res) => {
     res.send(req.rootUser);
 });
 
-router.post('/searchnote', async (req, res) => {
+router.post('/searchnote', async(req, res) => {
     const { user, tags } = req.body;
     if (!tags || !user) {
         return res.status(421).json({ message: "Empty Fields." });
@@ -111,15 +111,14 @@ router.post('/searchnote', async (req, res) => {
         for (let i = 0; i < tagsArray.length; i++) {
 
             var data = await Notebook.findOne({
-                user : user
-            },
-            {
-                notes : {
-                    $filter : {
-                        input : "$notes",
-                        as : "note",
-                        cond : {
-                            $in : [
+                user: user
+            }, {
+                notes: {
+                    $filter: {
+                        input: "$notes",
+                        as: "note",
+                        cond: {
+                            $in: [
                                 `${tagsArray[i]}`,
                                 "$$note.tags"
                             ]
@@ -127,12 +126,12 @@ router.post('/searchnote', async (req, res) => {
                     }
                 }
             });
-            if(data.notes.length !== 0)
+            if (data.notes.length !== 0)
                 searchedContent = searchedContent.concat(data);
         }
         const hashmap = new Map();
         for (const element of searchedContent) {
-            for(const e of element.notes){
+            for (const e of element.notes) {
                 hashmap.set(`${e._id}`, e);
             }
         }
@@ -149,7 +148,7 @@ router.post('/searchnote', async (req, res) => {
     }
 });
 
-router.post('/addnote', async (req, res) => {
+router.post('/addnote', async(req, res) => {
     const { user, title, tags, note } = req.body;
     if (!user || !title || !tags || !note) {
         return res.status(421).json({ message: "Empty Fields" })
@@ -197,30 +196,27 @@ router.post('/addnote', async (req, res) => {
 });
 
 
-router.post('/delete', async (req, res) => {
-    const {user, noteid} = req.body;
-    if(!user || !noteid){
-        return res.status(404).send({message : `Error : Unable to delete Note !!!`});
+router.post('/delete', async(req, res) => {
+    const { user, noteid } = req.body;
+    if (!user || !noteid) {
+        return res.status(404).send({ message: `Error : Unable to delete Note !!!` });
     }
     try {
-        const data = await Notebook.updateMany(
-            {user : user},
-            {
-                $pull : {
-                    notes : {
-                        '_id' : noteid
-                    }
+        const data = await Notebook.updateMany({ user: user }, {
+            $pull: {
+                notes: {
+                    '_id': noteid
                 }
             }
-        );
-        if(!data) res.status(404).send({message : "Error : Can't Delete !!! "});
+        });
+        if (!data) res.status(404).send({ message: "Error : Can't Delete !!! " });
         return res.status(200).send(data);
     } catch (error) {
         console.log(error);
     }
 });
 
-router.post('/getnotes', async (req, res) => {
+router.post('/getnotes', async(req, res) => {
     const { user } = req.body;
     if (!user) {
         return res.status(404).send({ message: `Undefined User ${user}` });
@@ -246,5 +242,3 @@ router.get('/signin', (req, res) => {
 });
 
 module.exports = router;
-
-
