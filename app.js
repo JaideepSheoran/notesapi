@@ -7,14 +7,14 @@ env.config({ path: './config.env' });
 
 const allowedOrigins = ['https://inotes-react.web.app'];
 
-const corsOptions = {
-    origin: '*'
-};
-
 
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors({
+    origin: '*',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Creating DB Connection
 require('./db/conn');
