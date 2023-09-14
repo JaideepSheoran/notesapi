@@ -3,8 +3,23 @@ const express = require('express');
 const app = express();
 var cookieParser = require('cookie-parser');
 env.config({ path: './config.env' });
+
+const allowedOrigins = ['https://inotes-react.web.app'];
+const corsOptions = {
+    origin: function(origin, callback) {
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+};
+
+
 app.use(cookieParser());
-app.use(express.json()); // middleware
+app.use(express.json());
+app.use(cors(corsOptions));
+
 // Creating DB Connection
 require('./db/conn');
 // End Here
