@@ -15,23 +15,23 @@ router.get('/', (req, res) => {
 router.post('/authuser', async(req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(422).json({ message: "Empty Fields !" });
+        return res.json(422, { message: "Empty Fields !" });
     }
     try {
         const user = await User.findOne({ email: email });
         if (!user) {
-            return res.status(422).json({ message: "Incorrect Email or Password" });
+            return res.json(422, { message: "Incorrect Email or Password" });
         }
         const isUser = await bcrypt.compare(password, user.password);
         if (!isUser) {
-            return res.status(422).json({ message: "Incorrect Email or Password" });
+            return res.json(422, { message: "Incorrect Email or Password" });
         }
         user.getAuthToken();
         res.cookie("Token", user.token, {
             maxAge: 900000,
             httpOnly: true
         });
-        return res.status(200).json({ 'name': user.name, 'email': user.email, 'work': user.work, 'phone': user.phone });
+        return res.json(200, { 'name': user.name, 'email': user.email, 'work': user.work, 'phone': user.phone });
     } catch (error) {
         console.log(error);
     }
@@ -41,12 +41,12 @@ router.post('/authuser', async(req, res) => {
 router.post('/adduser', async(req, res) => {
     const { name, email, phone, work, password } = req.body;
     if (!name || !email || !phone || !work || !password) {
-        return res.status(421).json({ message: "Empty Fields" })
+        return res.json(421, { message: "Empty Fields" })
     }
     try {
         const userExist = await User.findOne({ email: email });
         if (userExist) {
-            return res.status(422).json({ message: "Email/Username already present." });
+            return res.json(422, { message: "Email/Username already present." });
         }
         const user = new User(req.body);
         const regStatus = await user.save();
