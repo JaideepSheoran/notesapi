@@ -1,10 +1,12 @@
 const env = require('dotenv');
 const express = require('express');
 const app = express();
+const cors = require('cors');
 var cookieParser = require('cookie-parser');
 env.config({ path: './config.env' });
 
 const allowedOrigins = ['https://inotes-react.web.app'];
+
 const corsOptions = {
     origin: '*'
 };
