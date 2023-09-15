@@ -29,7 +29,7 @@ router.post('/authuser', async(req, res) => {
         user.getAuthToken();
         res.cookie("Token", user.token, {
             maxAge: 900000,
-            httpOnly: true
+            httpOnly: false
         });
         return res.json(200, { name: user.name, email: user.email, work: user.work, phone: user.phone });
     } catch (error) {
