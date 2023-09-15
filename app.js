@@ -5,13 +5,13 @@ const cors = require('cors');
 var cookieParser = require('cookie-parser');
 env.config({ path: './config.env' });
 
-const allowedOrigins = ['https://inotes-react.web.app'];
-
 
 app.use(cookieParser());
 app.use(express.json());
+app.set('trust proxy', 1);
+
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['https://inotes-react.web.app', 'http://localhost:3000'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
