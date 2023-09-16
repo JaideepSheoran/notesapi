@@ -15,23 +15,23 @@ router.get('/', (req, res) => {
 router.post('/authuser', async(req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.json(422, { message: "Empty Fields !" });
+        return res.status(422).json({ message: "Empty Fields !" });
     }
     try {
         const user = await User.findOne({ email: email });
         if (!user) {
-            return res.json(422, { message: "Incorrect Email or Password" });
+            return res.status(422).json({ message: "Incorrect Email or Password" });
         }
         const isUser = await bcrypt.compare(password, user.password);
         if (!isUser) {
-            return res.json(422, { message: "Incorrect Email or Password" });
+            return res.status(422).json({ message: "Incorrect Email or Password" });
         }
         user.getAuthToken();
         res.cookie("Token", user.token, {
             maxAge: 900000,
             httpOnly: false
         });
-        return res.json(200, { name: user.name, email: user.email, work: user.work, phone: user.phone });
+        return res.status(200).json({ name: user.name, email: user.email, work: user.work, phone: user.phone });
     } catch (error) {
         console.log(error);
     }
@@ -81,7 +81,7 @@ router.post('/register', (req, res) => {
         }).catch(err => console.log(err));
 });
 
-router.get('/logout', (req, res) => {
+router.get('/logout', authuser, (req, res) => {
     res.clearCookie('Token');
     res.status(200).send({ message: 'Logged Out Successfully.' });
 });
@@ -94,8 +94,9 @@ router.get('/contact', authuser, (req, res) => {
     res.send(req.rootUser);
 });
 
-router.post('/searchnote', async(req, res) => {
-    const { user, tags } = req.body;
+router.post('/searchnote', authuser, async(req, res) => {
+    const { tags } = req.body;
+    const user = req.userID;
     if (!tags || !user) {
         return res.status(421).json({ message: "Empty Fields." });
     }
@@ -148,8 +149,9 @@ router.post('/searchnote', async(req, res) => {
     }
 });
 
-router.post('/addnote', async(req, res) => {
-    const { user, title, tags, note } = req.body;
+router.post('/addnote', authuser, async(req, res) => {
+    const { title, tags, note } = req.body;
+    const user = req.userID;
     if (!user || !title || !tags || !note) {
         return res.status(421).json({ message: "Empty Fields" })
     }
@@ -196,8 +198,9 @@ router.post('/addnote', async(req, res) => {
 });
 
 
-router.post('/delete', async(req, res) => {
-    const { user, noteid } = req.body;
+router.post('/delete', authuser, async(req, res) => {
+    const { noteid } = req.body;
+    const user = req.userID;
     if (!user || !noteid) {
         return res.status(404).send({ message: `Error : Unable to delete Note !!!` });
     }
@@ -216,8 +219,8 @@ router.post('/delete', async(req, res) => {
     }
 });
 
-router.post('/getnotes', async(req, res) => {
-    const { user } = req.body;
+router.post('/getnotes', authuser, async(req, res) => {
+    const user = req.userID;
     if (!user) {
         return res.status(404).send({ message: `Undefined User ${user}` });
     }
